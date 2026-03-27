@@ -11,14 +11,17 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
 import type{ Product } from "../types";
+import type{ RootState } from "../app/store";
 import { StarIcon, PlusIcon, MinusIcon } from "../components/icons/Icons";
 
 interface ProductCardProps {
   product: Product;
   onToast: (msg: string, severity?: "success" | "error" | "info") => void;
+  onViewDetail: (product: Product) => void;
+  onLoginRequired: () => void;
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -40,8 +43,9 @@ function stockInfo(stock: number) {
   return { text: "In stock", color: "success" as const };
 }
 
-export default function ProductCard({ product, onToast }: ProductCardProps) {
+export default function ProductCard({ product, onToast, onViewDetail, onLoginRequired }: ProductCardProps) {
   const dispatch = useDispatch();
+  const currentUser = useSelector((s: RootState) => s.auth.currentUser);
   const [qty, setQty] = useState(1);
   const [imgIdx, setImgIdx] = useState(0);
   const [added, setAdded] = useState(false);
@@ -52,6 +56,10 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
   const stock = stockInfo(product.stock);
 
   const handleAdd = () => {
+    if (!currentUser) {
+      onLoginRequired();
+      return;
+    }
     dispatch(addToCart({ product, quantity: qty }));
     onToast(`${product.name} added to cart`);
     setAdded(true);
@@ -203,65 +211,98 @@ export default function ProductCard({ product, onToast }: ProductCardProps) {
         </Typography>
       </CardContent>
 
-      {/* ── Actions ── */}
-      <CardActions sx={{ p: 2, pt: 1, gap: 1 }}>
-        {/* Quantity selector */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 1,
-            overflow: "hidden",
-            flexShrink: 0,
-          }}
-        >
-          <IconButton
-            size="small"
-            onClick={() => setQty((q) => Math.max(1, q - 1))}
-            disabled={isDisabled}
-            sx={{ borderRadius: 0, p: "5px" }}
-          >
-            <MinusIcon />
-          </IconButton>
-          <Typography
+      <CardActions sx={{ p: 2, pt: 1, gap: 1, flexDirection: "column" }}>
+        {/* Qty + Add to cart row */}
+        <Box sx={{ display: "flex", gap: 1, width: "100%" }}>
+          {/* Quantity selector */}
+          <Box
             sx={{
-              px: 1.25,
-              fontSize: "0.82rem",
-              fontWeight: 700,
-              minWidth: 26,
-              textAlign: "center",
-              userSelect: "none",
+              display: "flex",
+              alignItems: "center",
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              overflow: "hidden",
+              flexShrink: 0,
             }}
           >
-            {qty}
-          </Typography>
-          <IconButton
+            <IconButton
+              size="small"
+              onClick={() => setQty((q) => Math.max(1, q - 1))}
+              disabled={isDisabled}
+              sx={{ borderRadius: 0, p: "5px" }}
+            >
+              <MinusIcon />
+            </IconButton>
+            <Box
+              component="input"
+              type="number"
+              value={qty}
+              disabled={isDisabled}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (isNaN(val)) return;
+                setQty(Math.min(product.stock, Math.max(1, val)));
+              }}
+              onBlur={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (isNaN(val) || val < 1) setQty(1);
+              }}
+              sx={{
+                width: 36,
+                border: "none",
+                outline: "none",
+                textAlign: "center",
+                fontSize: "0.82rem",
+                fontWeight: 700,
+                fontFamily: "inherit",
+                bgcolor: "transparent",
+                color: "text.primary",
+                p: 0,
+                cursor: isDisabled ? "not-allowed" : "text",
+                // hide number input spinners
+                "MozAppearance": "textfield",
+                "&::-webkit-outer-spin-button": { display: "none" },
+                "&::-webkit-inner-spin-button": { display: "none" },
+              }}
+            />
+            <IconButton
+              size="small"
+              onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+              disabled={isDisabled}
+              sx={{ borderRadius: 0, p: "5px" }}
+            >
+              <PlusIcon />
+            </IconButton>
+          </Box>
+
+          {/* Add to cart */}
+          <Button
+            variant="contained"
             size="small"
-            onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+            fullWidth
             disabled={isDisabled}
-            sx={{ borderRadius: 0, p: "5px" }}
+            onClick={handleAdd}
+            sx={{
+              transition: "background-color 0.25s",
+              bgcolor: added ? "success.main" : undefined,
+              color: added ? "#fff" : undefined,
+              "&:hover": { bgcolor: added ? "success.dark" : undefined },
+            }}
           >
-            <PlusIcon />
-          </IconButton>
+            {added ? "Added ✓" : "Add to Cart"}
+          </Button>
         </Box>
 
-        {/* Add to cart */}
+        {/* View Details */}
         <Button
-          variant="contained"
+          variant="outlined"
           size="small"
           fullWidth
-          disabled={isDisabled}
-          onClick={handleAdd}
-          sx={{
-            transition: "background-color 0.25s",
-            bgcolor: added ? "success.main" : undefined,
-            color: added ? "#fff" : undefined,
-            "&:hover": { bgcolor: added ? "success.dark" : undefined },
-          }}
+          onClick={() => onViewDetail(product)}
+          sx={{ color: "text.secondary", borderColor: "divider" }}
         >
-          {added ? "Added ✓" : "Add to Cart"}
+          View Details
         </Button>
       </CardActions>
     </Card>

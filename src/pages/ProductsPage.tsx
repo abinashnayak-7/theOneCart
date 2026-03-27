@@ -14,14 +14,17 @@ import type{ RootState } from "../app/store";
 import { setQuery } from "../store/searchSlice";
 import ProductCard from "../components/ProductCard";
 import { SearchIcon } from "../components/icons/Icons";
+import type{ Product } from "../types";
 
 const PER_PAGE = 12;
 
 interface ProductsPageProps {
   onToast: (msg: string, severity?: "success" | "error" | "info") => void;
+  onViewDetail: (product: Product) => void;
+  onLoginRequired: () => void;
 }
 
-export default function ProductsPage({ onToast }: ProductsPageProps) {
+export default function ProductsPage({ onToast, onViewDetail, onLoginRequired }: ProductsPageProps) {
   const dispatch = useDispatch();
   const products = useSelector((s: RootState) => s.products.items);
   const query = useSelector((s: RootState) => s.search.query);
@@ -119,7 +122,12 @@ export default function ProductsPage({ onToast }: ProductsPageProps) {
         <Grid container spacing={2.5}>
           {displayed.map((product) => (
             <Grid item xs={12} sm={6} md={3} key={product.id}>
-              <ProductCard product={product} onToast={onToast} />
+              <ProductCard
+                product={product}
+                onToast={onToast}
+                onViewDetail={onViewDetail}
+                onLoginRequired={onLoginRequired}
+              />
             </Grid>
           ))}
         </Grid>

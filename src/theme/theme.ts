@@ -44,6 +44,7 @@ export const getTheme = (mode: ColorMode): Theme =>
         fontWeight: 600,
         textTransform: "uppercase",
         fontSize: "0.68rem",
+        borderRadius:"15px"
       },
     },
     shape: { borderRadius: 2 },

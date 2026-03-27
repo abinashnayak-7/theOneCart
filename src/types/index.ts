@@ -23,6 +23,14 @@ export interface OrderDetails {
   payment: "cod" | "card" | "upi";
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string; // btoa — demo only, not production-safe
+  createdAt: string;
+}
+
 export type ColorMode = "light" | "dark";
 
 export type Page =
@@ -31,4 +39,6 @@ export type Page =
   | "add"
   | "cart"
   | "checkout"
-  | "confirmation";
+  | "confirmation"
+  | "detail"
+  | "login";

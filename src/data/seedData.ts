@@ -25,7 +25,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: "AirMax Pro Runner",
     brand: "Nike",
     price: 4999,
-    stock: 12,
+    stock: 412,
     description:
       "Lightweight performance running shoe with breathable mesh upper and responsive foam cushioning for all-day comfort.",
     imageUrls: [
@@ -59,7 +59,7 @@ export const SEED_PRODUCTS: Product[] = [
     imageUrls: [
       "https://images.unsplash.com/photo-1610945264803-c22b62d2a7b3?w=400&h=300&fit=crop",
     ],
-    isAvailable: true,
+    isAvailable: false,
     createdAt: "2024-01-03",
   },
   {
