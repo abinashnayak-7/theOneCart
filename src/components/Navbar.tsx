@@ -65,15 +65,24 @@ export default function Navbar({
   };
 
   return (
-    <AppBar position="sticky" color="transparent" elevation={0}>
+    <AppBar
+      position="sticky"
+      color="transparent"
+      elevation={0}
+      sx={{
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+      }}
+    >
       <Toolbar
         sx={{
           maxWidth: 1200,
           width: "100%",
           mx: "auto",
           px: { xs: 2, md: 4 },
-          minHeight: { xs: 56, md: 64 },
-          gap: 1,
+          minHeight: { xs: 64, md: 72 },
+          gap: 1.5,
         }}
       >
         {/* Logo */}
@@ -89,22 +98,22 @@ export default function Navbar({
         >
           <Box
             sx={{
-              width: 28,
-              height: 28,
+              width: 32,
+              height: 32,
               bgcolor: "primary.main",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
+              borderRadius: 1,
             }}
           >
             <Typography
               sx={{
                 color: "primary.contrastText",
                 fontWeight: 900,
-                fontSize: "0.8rem",
-                letterSpacing: "-0.06em",
-                lineHeight: 1,
+                fontSize: "0.95rem",
+                letterSpacing: "-0.05em",
               }}
             >
               TO
@@ -113,8 +122,8 @@ export default function Navbar({
           <Typography
             sx={{
               fontWeight: 800,
-              fontSize: "0.95rem",
-              letterSpacing: "0.12em",
+              fontSize: "1.05rem",
+              letterSpacing: "0.08em",
               display: { xs: "none", sm: "block" },
             }}
           >
@@ -127,27 +136,26 @@ export default function Navbar({
         {/* Nav links */}
         <Stack
           direction="row"
-          sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+          sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}
         >
           {NAV_LINKS.map(({ key, label }) => (
             <Button
               key={key}
               onClick={() => setPage(key)}
-              size="small"
               disableRipple
               sx={{
                 color: page === key ? "primary.main" : "text.secondary",
-                fontWeight: page === key ? 700 : 500,
-                px: 2,
+                fontWeight: page === key ? 700 : 600,
+                px: 2.5,
+                py: 1,
                 borderRadius: 0,
-                borderBottom: "2px solid",
+                position: "relative",
+                borderBottom: "3px solid",
                 borderColor: page === key ? "primary.main" : "transparent",
-                pb: "3px",
-                transition: "color 0.15s, border-color 0.15s",
                 "&:hover": {
                   bgcolor: "transparent",
                   color: "text.primary",
-                  borderColor: "divider",
+                  borderColor: page === key ? "primary.main" : "divider",
                 },
               }}
             >
@@ -156,134 +164,173 @@ export default function Navbar({
           ))}
         </Stack>
 
-        {/* Theme toggle */}
-        <IconButton
-          onClick={toggleMode}
-          size="small"
-          sx={{ color: "text.secondary", "&:hover": { color: "text.primary" } }}
-        >
-          {mode === "light" ? <MoonIcon /> : <SunIcon />}
-        </IconButton>
+        {/* Right side actions */}
+        <Stack direction="row" alignItems="center" gap={0.5}>
+          {/* Theme toggle - Fixed icon size */}
+          <IconButton
+            onClick={toggleMode}
+            size="medium"
+            sx={{
+              color: "text.secondary",
+              "&:hover": { color: "text.primary", bgcolor: "action.hover" },
+            }}
+          >
+            <Box sx={{ fontSize: 24, display: "flex", alignItems: "center" }}>
+              {mode === "light" ? <MoonIcon /> : <SunIcon />}
+            </Box>
+          </IconButton>
 
-        {/* Cart */}
-        <IconButton
-          onClick={() => {
-            if (!currentUser) {
-              setPage("login");
-              return;
-            }
-            setPage("cart");
-          }}
-          sx={{ color: "text.primary", ml: 0.5 }}
-        >
-          <CartIcon count={currentUser ? cartCount : 0} />
-        </IconButton>
+          {/* Cart - Fixed icon size */}
+          <IconButton
+            onClick={() => {
+              if (!currentUser) {
+                setPage("login");
+                return;
+              }
+              setPage("cart");
+            }}
+            sx={{
+              color: "text.primary",
+              "&:hover": { bgcolor: "action.hover" },
+            }}
+          >
+            <Box sx={{ fontSize: 24, display: "flex", alignItems: "center" }}>
+              <CartIcon count={currentUser ? cartCount : 0} />
+            </Box>
+          </IconButton>
 
-        {/* User avatar / login button */}
-        {currentUser ? (
-          <>
-            <Tooltip title={currentUser.name}>
-              <Avatar
-                onClick={(e) => setAnchorEl(e.currentTarget)}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  ml: 0.5,
-                  bgcolor: "primary.main",
-                  color: "primary.contrastText",
-                  fontSize: "0.72rem",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  letterSpacing: "0.02em",
-                  border: "2px solid",
-                  borderColor:
-                    page === "login" ? "primary.main" : "transparent",
-                  transition: "border-color 0.15s",
-                  "&:hover": { borderColor: "text.secondary" },
+          {/* User avatar / login button */}
+          {currentUser ? (
+            <>
+              <Tooltip title={currentUser.name}>
+                <Avatar
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    ml: 1,
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    border: "2px solid",
+                    borderColor: "background.paper",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      borderColor: "primary.main",
+                      transform: "scale(1.06)",
+                    },
+                  }}
+                >
+                  {getInitials(currentUser.name)}
+                </Avatar>
+              </Tooltip>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={menuOpen}
+                onClose={() => setAnchorEl(null)}
+                PaperProps={{
+                  sx: {
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.12)",
+                    minWidth: 220,
+                    borderRadius: 2,
+                    mt: 1,
+                    overflow: "hidden",
+                  },
                 }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                {getInitials(currentUser.name)}
-              </Avatar>
-            </Tooltip>
+                <Box sx={{ px: 2.5, py: 2 }}>
+                  <Typography variant="subtitle2" fontWeight={700}>
+                    {currentUser.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {currentUser.email}
+                  </Typography>
+                </Box>
 
-            <Menu
-              anchorEl={anchorEl}
-              open={menuOpen}
-              onClose={() => setAnchorEl(null)}
-              PaperProps={{
-                sx: {
-                  border: "1px solid",
-                  borderColor: "divider",
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-                  minWidth: 200,
-                  borderRadius: 1,
-                  mt: 0.75,
+                <Divider />
+
+                <MenuItem
+                  onClick={() => {
+                    setPage("cart");
+                    setAnchorEl(null);
+                  }}
+                  sx={{ py: 1.5 }}
+                >
+                  My Cart
+                  {cartCount > 0 && (
+                    <Box
+                      sx={{
+                        ml: "auto",
+                        bgcolor: "primary.main",
+                        color: "primary.contrastText",
+                        borderRadius: "9999px",
+                        minWidth: 20,
+                        height: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        px: 1,
+                      }}
+                    >
+                      {cartCount}
+                    </Box>
+                  )}
+                </MenuItem>
+
+                <MenuItem
+                  onClick={() => {
+                    setAnchorEl(null);
+                  }}
+                  sx={{ py: 1.5 }}
+                >
+                  Profile
+                </MenuItem>
+
+                <Divider />
+
+                <MenuItem
+                  onClick={handleLogout}
+                  sx={{
+                    py: 1.5,
+                    color: "error.main",
+                    "&:hover": {
+                      bgcolor: "error.main",
+                      color: "error.contrastText",
+                    },
+                  }}
+                >
+                  Sign Out
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setPage("login")}
+              sx={{
+                ml: 1,
+                borderColor: "divider",
+                color: "text.secondary",
+                "&:hover": {
+                  borderColor: "text.primary",
+                  color: "text.primary",
                 },
               }}
-              transformOrigin={{ horizontal: "right", vertical: "top" }}
-              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-              {/* User info header */}
-              <Box sx={{ px: 2, py: 1.5 }}>
-                <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  {currentUser.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {currentUser.email}
-                </Typography>
-              </Box>
-
-              <Divider />
-
-              <MenuItem
-                onClick={() => {
-                  setPage("cart");
-                  setAnchorEl(null);
-                }}
-                sx={{ fontSize: "0.85rem", py: 1.25 }}
-              >
-                My Cart
-                {cartCount > 0 && (
-                  <Box
-                    sx={{
-                      ml: "auto",
-                      bgcolor: "primary.main",
-                      color: "primary.contrastText",
-                      borderRadius: "50%",
-                      width: 20,
-                      height: 20,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {cartCount}
-                  </Box>
-                )}
-              </MenuItem>
-
-              <Divider />
-
-              <MenuItem
-                onClick={handleLogout}
-                sx={{ fontSize: "0.85rem", py: 1.25, color: "error.main" }}
-              >
-                Sign Out
-              </MenuItem>
-            </Menu>
-          </>
-        ) : (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => setPage("login")}
-            sx={{ ml: 0.5, borderColor: "divider", color: "text.secondary" }}
-          >
-            Sign In
-          </Button>
-        )}
+              Sign In
+            </Button>
+          )}
+        </Stack>
       </Toolbar>
     </AppBar>
   );

@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
-import type{ Product } from "../types";
-import type{ RootState } from "../app/store";
+import type { Product } from "../types";
+import type { RootState } from "../app/store";
 import { StarIcon, PlusIcon, MinusIcon } from "../components/icons/Icons";
 
 interface ProductCardProps {
@@ -26,7 +26,14 @@ interface ProductCardProps {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 0.3, color: "text.secondary" }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 0.3,
+        color: "text.secondary",
+      }}
+    >
       {[1, 2, 3, 4, 5].map((s) => (
         <StarIcon key={s} filled={s <= Math.round(rating)} />
       ))}
@@ -39,11 +46,17 @@ function StarRating({ rating }: { rating: number }) {
 
 function stockInfo(stock: number) {
   if (stock === 0) return { text: "Out of stock", color: "error" as const };
-  if (stock <= 15) return { text: `Only ${stock} left`, color: "warning" as const };
+  if (stock <= 15)
+    return { text: `Only ${stock} left`, color: "warning" as const };
   return { text: "In stock", color: "success" as const };
 }
 
-export default function ProductCard({ product, onToast, onViewDetail, onLoginRequired }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  onToast,
+  onViewDetail,
+  onLoginRequired,
+}: ProductCardProps) {
   const dispatch = useDispatch();
   const currentUser = useSelector((s: RootState) => s.auth.currentUser);
   const [qty, setQty] = useState(1);
@@ -68,6 +81,7 @@ export default function ProductCard({ product, onToast, onViewDetail, onLoginReq
 
   return (
     <Card
+      onClick={() => onViewDetail(product)}
       sx={{
         height: "100%",
         display: "flex",
@@ -81,7 +95,13 @@ export default function ProductCard({ product, onToast, onViewDetail, onLoginReq
       }}
     >
       {/* ── Image ── */}
-      <Box sx={{ position: "relative", overflow: "hidden", bgcolor: "action.hover" }}>
+      <Box
+        sx={{
+          position: "relative",
+          overflow: "hidden",
+          bgcolor: "action.hover",
+        }}
+      >
         <CardMedia
           component="img"
           height="210"
@@ -176,10 +196,21 @@ export default function ProductCard({ product, onToast, onViewDetail, onLoginReq
           />
         </Box>
 
-        <Tooltip title={product.description} placement="top" arrow enterDelay={400}>
+        <Tooltip
+          title={product.description}
+          placement="top"
+          arrow
+          enterDelay={400}
+        >
           <Typography
             variant="subtitle2"
-            sx={{ mt: 1, mb: 0.5, fontWeight: 700, lineHeight: 1.35, cursor: "default" }}
+            sx={{
+              mt: 1,
+              mb: 0.5,
+              fontWeight: 700,
+              lineHeight: 1.35,
+              cursor: "default",
+            }}
           >
             {product.name}
           </Typography>
@@ -205,7 +236,12 @@ export default function ProductCard({ product, onToast, onViewDetail, onLoginReq
 
         <Typography
           variant="h6"
-          sx={{ mt: 1.5, fontWeight: 800, letterSpacing: "-0.03em", fontSize: "1.1rem" }}
+          sx={{
+            mt: 1.5,
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
+            fontSize: "1.1rem",
+          }}
         >
           ₹{product.price.toLocaleString("en-IN")}
         </Typography>
@@ -261,7 +297,7 @@ export default function ProductCard({ product, onToast, onViewDetail, onLoginReq
                 p: 0,
                 cursor: isDisabled ? "not-allowed" : "text",
                 // hide number input spinners
-                "MozAppearance": "textfield",
+                MozAppearance: "textfield",
                 "&::-webkit-outer-spin-button": { display: "none" },
                 "&::-webkit-inner-spin-button": { display: "none" },
               }}
